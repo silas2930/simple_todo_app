@@ -41,7 +41,6 @@ export default function Page() {
           name="description"
           className="border border-slate-300 bg-transparent px-2 py-1 rounded focus-within:border-slate-100 outline-none"
           placeholder="Description"
-          rows="4"
         />
         <div className="flex gap-1 justify-end">
           <Link href=".." className="border border-slate-300 text-slate-300 px-2 py-1 rounded hover:bg-slate-700 focus-within:bg-slate-700 outline-none">
