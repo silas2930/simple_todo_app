@@ -4,7 +4,7 @@ import { LayoutGrid } from 'lucide-react'
 
 const Navbar = () => {
   return (
-    <div className="navbar bg-gray-900 rounded mb-10">
+    <div className="navbar bg-base-200 rounded mb-10">
         <div className="container">
             <div className="flex-none justify-end">
                 <Link href='/new' className='btn btn-ghost'>Add New Todo</Link>

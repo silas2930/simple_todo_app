@@ -16,8 +16,10 @@ const config: Config = {
     },
   },
   plugins: [require("daisyui")],
-  themes: true, // true: all themes | false: only light + dark | array: specific themes like this ["light", "dark", "cupcake"]
+  daisyui: {
+    themes: true, // true: all themes | false: only light + dark | array: specific themes like this ["light", "dark", "cupcake"]
     prefix: "", // prefix for daisyUI classnames (components, modifiers and responsive class names. Not colors)
     logs: true,
+  }
 }
 export default config
