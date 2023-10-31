@@ -1,72 +1,110 @@
 import { prisma } from "@/db";
 import { notFound, useSearchParams, useRouter, redirect } from 'next/navigation'
 import Link from "next/link";
+import { FC, useEffect, useState } from 'react'
+import { ChevronLeft } from 'lucide-react'
 
-// async function updateTodo(data: FormData) {
-//     "use server";
+interface TodoProps {
+  params: {
+    id: string
+  }
+}
 
-//     // const title = data.get("title")?.valueOf();
-//     // const description = data.get("description")?.valueOf();
+async function getTodos(id: string) {
+  const response = await prisma.todo.findFirst({
+    where: {
+      id: id
+    },
+    include: {
+      tag: true
+    }
+  })
+  return response
+}
 
-//     const searchParams = useSearchParams();
-//     const id = searchParams.get('id');
+const EditTodo: FC<TodoProps> = async ({ params }) => {
+  const todos = await getTodos(params.id);
+  const tags = await prisma.tag.findMany();
 
-//     if (typeof title !== "string") {
-//     throw new Error("Invalid Title");
-//     }
-// console.log({id});
-//     // await prisma.todo.update({
-//     //     where: {
-//     //       id: { id },
-//     //     },
-//     //     data: {
-//     //         title: title as string,
-//     //         description: description as string,
-//     //     },
-//     //   })
+  async function updateTodo(data: FormData){
+    "use server";
 
-// redirect("/");
-// }
+    const title = data.get("title")?.valueOf();
+    const description = data.get("description")?.valueOf();
+    const tagId = data.get("tagId")?.valueOf();
+  
+    if (typeof title !== "string") {
+      throw new Error("Invalid Title");
+    }
+  
+    await prisma.todo.update({
+      where: {
+        id: params.id
+      },
+      data: {
+        title: title as string,
+        description: description as string,
+        complete: false,
+        tagId: tagId as string
+      },
+    });
+    
+    redirect("/");
+  }
+
+  return (
+    <>
+      <header className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl my-4 font-bold text-center">Update Todo</h1>
+      </header>
+      <form action={updateTodo} className="flex flex-col items-center justify-center gap-5 mt-10">
+        <input
+          type="text"
+          name="title"
+          defaultValue= {todos?.title}
+          className="input input-bordered w-full max-w-sm"
+          placeholder="Title"
+          required
+        />
+        <textarea
+          name="description"
+          className="textarea textarea-bordered w-full max-w-sm"
+          placeholder="Description"
+          defaultValue={todos?.description ?? ''}
+        />
+        <select name="tagId" className="select select-bordered w-full max-w-sm" defaultValue={todos?.tag.id}>
+          <option value="">Select Tags</option>
+          {tags?.map(item => (
+              <option key={item.id} value={item.id}>{item.name}</option>
+          ))}
+        </select>
+        <div className="flex gap-1 justify-end">
+          <Link href=".." className="btn btn-warning mr-5">
+           Cancel
+          </Link>
+          <button
+            type="submit"
+            className="btn btn-primary mr-5"
+          >
+            Update
+          </button>
+          <button
+            type="button"
+            className="btn btn-error"
+          >
+            Delete
+          </button>
+        </div>
+      </form>
+    </>
+  );
+}
+
+export default EditTodo;
 
 
 // export default function Page({ params }: {
 //     params: { id: string }
 // }) {
-//     return (
-//       <>
-//         <header className="flex justify-between items-center mb-4">
-//           <h1 className="text-2xl">Add Todo</h1>
-//         </header>
-//         <form action={updateTodo} className="flex gap-2 flex-col mb-8">
-//           <input
-//             type="text"
-//             name="title"
-//             className="border border-slate-300 bg-transparent px-2 py-1 rounded focus-within:border-slate-100 outline-none"
-//             placeholder="Title"
-//           />
-//           <textarea
-//             name="description"
-//             className="border border-slate-300 bg-transparent px-2 py-1 rounded focus-within:border-slate-100 outline-none"
-//             placeholder="Description"
-//             rows="4"
-//           />
-//           <div className="flex gap-1 justify-end">
-//             <Link href=".." className="border border-slate-300 text-slate-300 px-2 py-1 rounded hover:bg-slate-700 focus-within:bg-slate-700 outline-none">
-//               Cancel
-//             </Link>
-//             <button
-//               type="submit"
-//               className="border border-slate-300 text-slate-300 px-2 py-1 rounded hover-bg-slate-700 focus-within:bg-slate-700 outline-none"
-//             >
-//               Create
-//             </button>
-//           </div>
-//         </form>
-//       </>
-//     );
+//     return <h1>ID: {params.id}</h1>
 // }
-export default function Page({ params }: {
-    params: { id: string }
-}) {
-    return <h1>ID: {params.id}</h1>
-}
